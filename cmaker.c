@@ -30,7 +30,7 @@ int main(int argc, char **argv) {
     fprintf(file_out, "#include <stdio.h>\n");
     fprintf(file_out, "#include <stdlib.h>\n");
     fprintf(file_out, "\n");
-    fprintf(file_out, "int main() {\n");
+    fprintf(file_out, "int main(int argc, char **argv) {\n");
     fprintf(file_out, "    FILE *file = fopen(\"temp%lu.c\", \"w\");\n", current_time+1);
     fprintf(file_out, "    if (file == NULL) {\n");
     fprintf(file_out, "        fprintf(stderr, \"Could not open temp.c\\n\");\n");
@@ -60,7 +60,13 @@ int main(int argc, char **argv) {
 
     fprintf(file_out, "    fclose(file);\n");
     fprintf(file_out, "    system(\"gcc -o temp%lu temp%lu.c\");\n", current_time+1, current_time+1);
-    fprintf(file_out, "    system(\"./temp%lu\");\n", current_time+1);
+    fprintf(file_out, "    char buffer[0x10000];\n");
+    fprintf(file_out, "    char *ptr = buffer;\n");
+    fprintf(file_out, "    ptr += sprintf(ptr, \"./temp%lu\");\n", current_time+1);
+    fprintf(file_out, "    for (int i = 1; i < argc; i++) {;\n");
+    fprintf(file_out, "        ptr += sprintf(ptr, \" %%s\", argv[i]);\n");
+    fprintf(file_out, "    }\n");
+    fprintf(file_out, "    system(buffer);\n");
     fprintf(file_out, "    return EXIT_SUCCESS;\n");
     fprintf(file_out, "}\n");
 
